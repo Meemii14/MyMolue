@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Ride History{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>MyMolue</span>
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('auth.rider_dashboard') }}">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('auth.book_ride') }}">
+                <i class="fa-solid fa-car"></i>
+                Book Ride
+            </a>
+
+            <a href="{{ url_for('auth.wallet') }}">
+                <i class="fa-solid fa-wallet"></i>
+                Wallet
+            </a>
+
+            <a class="active">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Ride History
+            </a>
+
+            <a href="{{ url_for('auth.shared_rides') }}">
+                <i class="fa-solid fa-users"></i>
+                Shared Ride
+            </a>
+
+            <a href="{{ url_for('auth.profile') }}">
+                <i class="fa-solid fa-user"></i>
+                Profile
+            </a>
+
+            <a href="{{ url_for('auth.settings') }}">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <main class="main-content">
+
+        <div class="topbar">
+
+            <div>
+
+                <h2>Ride History 🚖</h2>
+
+                <p>All your ride requests appear here.</p>
+
+            </div>
+
+        </div>
+
+        <div class="ride-card">
+
+            <table style="width:100%; border-collapse:collapse;">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Pickup</th>
+
+                        <th>Destination</th>
+
+                        <th>Fare</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% if rides %}
+
+                    {% for ride in rides %}
+
+                    <tr>
+
+                        <td>{{ ride.pickup }}</td>
+
+                        <td>{{ ride.destination }}</td>
+
+                        <td>₦{{ "%.2f"|format(ride.fare_offer) }}</td>
+
+                        <td>
+
+                            {% if ride.status=="Pending" %}
+
+                                <span style="color:orange;font-weight:bold;">
+                                    Pending
+                                </span>
+
+                            {% elif ride.status=="Accepted" %}
+
+                                <span style="color:green;font-weight:bold;">
+                                    Accepted
+                                </span>
+
+                            {% elif ride.status=="Completed" %}
+
+                                <span style="color:blue;font-weight:bold;">
+                                    Completed
+                                </span>
+
+                            {% else %}
+
+                                {{ ride.status }}
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="4" style="text-align:center;padding:40px;">
+
+                            No rides yet.
+
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

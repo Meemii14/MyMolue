@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Wallet{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>MyMolue</span>
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('auth.rider_dashboard') }}">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('auth.book_ride') }}">
+                <i class="fa-solid fa-car"></i>
+                Book Ride
+            </a>
+
+            <a class="active">
+                <i class="fa-solid fa-wallet"></i>
+                Wallet
+            </a>
+
+            <a href="{{ url_for('auth.ride_history') }}">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Ride History
+            </a>
+
+            <a href="{{ url_for('auth.shared_rides') }}">
+                <i class="fa-solid fa-users"></i>
+                Shared Ride
+            </a>
+
+            <a href="{{ url_for('auth.profile') }}">
+                <i class="fa-solid fa-user"></i>
+                Profile
+            </a>
+
+            <a href="{{ url_for('auth.settings') }}">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <!-- Main -->
+
+    <main class="main-content">
+
+        <div class="topbar">
+
+            <div>
+
+                <h2>My Wallet 💳</h2>
+
+                <p>Manage your balance and payments.</p>
+
+            </div>
+
+        </div>
+
+        <div class="wallet-box" style="max-width:450px;">
+
+            <small>Available Balance</small>
+
+            <h1>₦{{ "%.2f"|format(current_user.wallet) }}</h1>
+
+        </div>
+
+        <br><br>
+
+        <div class="cards">
+
+            <div class="card">
+
+                <i class="fa-solid fa-plus fa-2x"></i>
+
+                <h3>Fund Wallet</h3>
+
+                <p>Add money securely.</p>
+
+                <br>
+
+                <button class="primary-btn">
+
+                    Fund Wallet
+
+                </button>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-money-bill-transfer fa-2x"></i>
+
+                <h3>Transfer</h3>
+
+                <p>Send money to another rider.</p>
+
+                <br>
+
+                <button class="primary-btn">
+
+                    Transfer
+
+                </button>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-receipt fa-2x"></i>
+
+                <h3>Transactions</h3>
+
+                <p>View payment history.</p>
+
+                <br>
+
+                <button class="primary-btn">
+
+                    View History
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <br><br>
+
+        <div class="ride-card">
+
+            <h2>Recent Transactions</h2>
+
+            <br>
+
+            <table style="width:100%;">
+
+                <tr>
+
+                    <th>Date</th>
+
+                    <th>Description</th>
+
+                    <th>Amount</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+                <tr>
+
+                    <td>--</td>
+
+                    <td>No transactions yet</td>
+
+                    <td>₦0.00</td>
+
+                    <td>—</td>
+
+                </tr>
+
+            </table>
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

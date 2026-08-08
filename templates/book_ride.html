@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Book Ride{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>MyMolue</span>
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('auth.rider_dashboard') }}">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a class="active">
+                <i class="fa-solid fa-car"></i>
+                Book Ride
+            </a>
+
+            <a href="{{ url_for('auth.wallet') }}">
+                <i class="fa-solid fa-wallet"></i>
+                Wallet
+            </a>
+
+            <a href="{{ url_for('auth.ride_history') }}">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Ride History
+            </a>
+
+            <a href="{{ url_for('auth.shared_rides') }}">
+                <i class="fa-solid fa-users"></i>
+                Shared Ride
+            </a>
+
+            <a href="{{ url_for('auth.profile') }}">
+                <i class="fa-solid fa-user"></i>
+                Profile
+            </a>
+
+            <a href="{{ url_for('auth.settings') }}">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+        <div class="topbar">
+
+            <div>
+
+                <h2>Book a Ride 🚖</h2>
+
+                <p>Choose your route and negotiate your own fare.</p>
+
+            </div>
+
+        </div>
+
+        <div class="ride-card">
+
+            <form method="POST" action="{{ url_for('auth.request_ride') }}">
+
+                <label>Pickup Location</label>
+
+                <input
+                    type="text"
+                    name="pickup"
+                    placeholder="e.g. Yaba"
+                    required>
+
+                <label>Destination</label>
+
+                <input
+                    type="text"
+                    name="destination"
+                    placeholder="e.g. Lekki Phase 1"
+                    required>
+
+                <label>Your Fare Offer (₦)</label>
+
+                <input
+                    type="number"
+                    name="fare_offer"
+                    placeholder="3500"
+                    required>
+
+                <button class="primary-btn">
+
+                    <i class="fa-solid fa-car"></i>
+
+                    Find Drivers
+
+                </button>
+
+            </form>
+
+        </div>
+
+        <br>
+
+        <div class="cards">
+
+            <div class="card">
+
+                <i class="fa-solid fa-money-bill-wave fa-2x"></i>
+
+                <h3>Negotiate</h3>
+
+                <p>Offer your own fare and wait for drivers to respond.</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-users fa-2x"></i>
+
+                <h3>Shared Ride</h3>
+
+                <p>Split ride costs with another passenger.</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-bolt fa-2x"></i>
+
+                <h3>Quick Match</h3>
+
+                <p>Automatically connect with nearby drivers.</p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

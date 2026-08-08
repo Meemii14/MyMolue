@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}
+Login | MyMolue
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-page">
+
+    <!-- Left Side -->
+
+    <div class="auth-left">
+
+        <div class="brand">
+
+            <i class="fa-solid fa-location-dot"></i>
+
+            <h1>MyMolue</h1>
+
+        </div>
+
+        <h2>Your Ride.<br>Your Price.</h2>
+
+        <p>
+            Nigeria's first ride-hailing platform where riders and drivers
+            negotiate fares in real time.
+        </p>
+
+        <div class="features-list">
+
+            <div>
+                <i class="fa-solid fa-check"></i>
+                Negotiate Ride Prices
+            </div>
+
+            <div>
+                <i class="fa-solid fa-check"></i>
+                Shared Rides
+            </div>
+
+            <div>
+                <i class="fa-solid fa-check"></i>
+                Secure Wallet
+            </div>
+
+            <div>
+                <i class="fa-solid fa-check"></i>
+                Verified Drivers
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Right Side -->
+
+    <div class="auth-card">
+
+        <h2>Welcome Back 👋</h2>
+
+        <p>Login to your MyMolue account</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('auth.login') }}" method="POST">
+
+            <label>Email Address</label>
+
+            <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required>
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                required>
+
+            <button type="submit">
+
+                <i class="fa-solid fa-right-to-bracket"></i>
+
+                Login
+
+            </button>
+
+        </form>
+
+        <div class="register-link">
+
+            <p>
+
+                Don't have an account?
+
+                <a href="{{ url_for('auth.register') }}">
+
+                    Create Account
+
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block title %}Driver Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-layout">
+
+<aside class="sidebar">
+
+<div class="logo">
+
+<i class="fa-solid fa-car-side"></i>
+
+<span>MyMolue Driver</span>
+
+</div>
+
+<nav>
+
+<a class="active">
+
+<i class="fa-solid fa-house"></i>
+
+Dashboard
+
+</a>
+
+<a href="#">
+
+<i class="fa-solid fa-list"></i>
+
+Available Rides
+
+</a>
+
+<a href="#">
+
+<i class="fa-solid fa-wallet"></i>
+
+Earnings
+
+</a>
+
+<a href="#">
+
+<i class="fa-solid fa-clock"></i>
+
+Trip History
+
+</a>
+
+<a href="#">
+
+<i class="fa-solid fa-user"></i>
+
+Profile
+
+</a>
+
+<a href="{{ url_for('auth.logout') }}">
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Logout
+
+</a>
+
+</nav>
+
+</aside>
+
+<main class="main-content">
+
+    <div class="topbar">
+
+        <div>
+
+            <h2>Welcome, {{ current_user.fullname }} 👋</h2>
+
+            <p>Manage incoming ride requests.</p>
+
+        </div>
+
+        <div style="display:flex;gap:20px;align-items:center;">
+
+            <div class="wallet-box">
+
+                <small>Today's Earnings</small>
+
+                <h2>₦0.00</h2>
+
+            </div>
+
+            <button class="primary-btn">
+
+                🟢 Online
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="cards">
+
+        <div class="card">
+
+            <h4>Pending Requests</h4>
+
+            <h1>{{ rides|length }}</h1>
+
+        </div>
+
+        <div class="card">
+
+            <h4>Completed Today</h4>
+
+            <h1>0</h1>
+
+        </div>
+
+        <div class="card">
+
+            <h4>Rating</h4>
+
+            <h1>⭐ {{ current_user.rating }}</h1>
+
+        </div>
+
+    </div>
+
+
+    <br><br>
+
+    <h2>Available Ride Requests</h2>
+
+    <br>
+
+    {% for ride in rides %}
+
+    <div class="ride-card" style="margin-bottom:25px;">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+
+            <div>
+
+                <h2>📍 {{ ride.pickup }}</h2>
+
+                <h3>➡ {{ ride.destination }}</h3>
+
+            </div>
+
+            <div style="text-align:right;">
+
+                <h2 style="color:#F4B400;">
+
+                    ₦{{ "%.0f"|format(ride.fare_offer) }}
+
+                </h2>
+
+                <small>{{ ride.status }}</small>
+
+            </div>
+
+        </div>
+
+        <hr style="margin:20px 0;">
+
+        <div style="display:flex;gap:15px;flex-wrap:wrap;">
+
+            <form action="{{ url_for('auth.accept_ride', ride_id=ride.id) }}" method="POST">
+
+                <button type="submit" class="primary-btn">
+
+                    ✅ Accept Ride
+
+                </button>
+
+            </form>
+<form
+    action="{{ url_for('auth.driver_arriving', ride_id=ride.id) }}"
+    method="POST">
+
+    <button
+        type="submit"
+        class="primary-btn">
+
+        I'm Arriving
+
+    </button>
+
+</form>
+
+{% elif ride.status == "Arriving" and ride.driver_id == current_user.id %}
+
+<form
+    action="{{ url_for('auth.start_trip', ride_id=ride.id) }}"
+    method="POST">
+
+    <button
+        type="submit"
+        class="primary-btn">
+
+        Start Trip
+
+    </button>
+
+</form>
+
+{% elif ride.status == "In Progress" and ride.driver_id == current_user.id %}
+
+<form
+    action="{{ url_for('auth.complete_trip', ride_id=ride.id) }}"
+    method="POST">
+
+    <button
+        type="submit"
+        class="primary-btn">
+
+        Complete Trip
+
+    </button>
+
+</form>
+
+{% endif %}
+
+<form
+    action="{{ url_for('auth.start_trip', ride_id=ride.id) }}"
+    method="POST">
+
+    <button
+        type="submit"
+        class="primary-btn">
+
+        Start Trip
+
+    </button>
+
+</form>
+
+{% elif ride.status == "In Progress" and ride.driver_id == current_user.id %}
+
+<form
+    action="{{ url_for('auth.complete_trip', ride_id=ride.id) }}"
+    method="POST">
+
+    <button
+        type="submit"
+        class="primary-btn">
+
+        Complete Trip
+
+    </button>
+
+</form>
+
+{% endif %}
+            <form
+    action="{{ url_for('auth.counter_offer', ride_id=ride.id) }}"
+    method="POST"
+    style="display:inline;"
+>
+
+    <input
+        type="number"
+        name="counter_offer"
+        placeholder="Enter fare"
+        required
+        style="
+            width:120px;
+            padding:10px;
+            border-radius:8px;
+            border:1px solid #ccc;
+        "
+    >
+
+    <button
+        type="submit"
+        class="secondary-btn"
+    >
+        Send Counter
+    </button>
+
+</form>
+
+            <button style="padding:15px 25px;border:none;border-radius:12px;background:#EF4444;color:white;cursor:pointer;">
+
+                ❌ Decline
+
+            </button>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="ride-card">
+
+        <h2>No ride requests nearby.</h2>
+
+        <p>New requests will appear automatically.</p>
+
+    </div>
+
+    {% endfor %}
+
+</main>
+
+</div>
+
+{% endblock %}

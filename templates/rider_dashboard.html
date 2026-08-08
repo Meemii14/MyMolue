@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Rider Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>MyMolue</span>
+        </div>
+
+        <nav>
+
+            <a class="active" href="{{ url_for('auth.rider_dashboard') }}">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('auth.book_ride') }}">
+                <i class="fa-solid fa-car"></i>
+                Book Ride
+            </a>
+
+            <a href="{{ url_for('auth.wallet') }}">
+                <i class="fa-solid fa-wallet"></i>
+                Wallet
+            </a>
+
+            <a href="{{ url_for('auth.ride_history') }}">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Ride History
+            </a>
+
+            <a href="{{ url_for('auth.shared_rides') }}">
+                <i class="fa-solid fa-users"></i>
+                Shared Ride
+            </a>
+
+            <a href="{{ url_for('auth.profile') }}">
+                <i class="fa-solid fa-user"></i>
+                Profile
+            </a>
+
+            <a href="{{ url_for('auth.settings') }}">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <div class="topbar">
+
+            <div>
+
+                <h2>Welcome 👋</h2>
+
+                <p>Hello, <strong>{{ current_user.fullname }}</strong></p>
+
+            </div>
+
+            <div class="wallet-box">
+
+                <small>Wallet Balance</small>
+
+                <h2>₦{{ "{:,.2f}".format(current_user.wallet) }}</h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-grid">
+
+            <div class="stats-card">
+
+                <i class="fa-solid fa-road"></i>
+
+                <h4>Completed Trips</h4>
+
+                <h2>{{ completed }}</h2>
+
+            </div>
+
+            <div class="stats-card">
+
+                <i class="fa-solid fa-clock"></i>
+
+                <h4>Pending Trips</h4>
+
+                <h2>{{ pending }}</h2>
+
+            </div>
+
+            <div class="stats-card">
+
+                <i class="fa-solid fa-wallet"></i>
+
+                <h4>Wallet</h4>
+
+                <h2>₦{{ "{:,.2f}".format(current_user.wallet) }}</h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="ride-card">
+
+            <h2>Book a Ride</h2>
+
+            <form method="POST" action="{{ url_for('auth.request_ride') }}">
+
+                <label>Pickup Location</label>
+
+                <input
+                    type="text"
+                    name="pickup"
+                    required
+                >
+
+                <label>Destination</label>
+
+                <input
+                    type="text"
+                    name="destination"
+                    required
+                >
+
+                <label>Your Fare Offer (₦)</label>
+
+                <input
+                    type="number"
+                    name="fare_offer"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                >
+                    Find Drivers
+                </button>
+
+            </form>
+
+        </div>
+
+<div class="recent-rides">
+
+    <h2>Recent Ride Requests</h2>
+
+    <table>
+
+        <tr>
+            <th>Route</th>
+            <th>Fare</th>
+            <th>Status</th>
+        </tr>
+
+        {% if rides %}
+
+            {% for ride in rides %}
+
+            <tr>
+
+                <td>
+                    {{ ride.pickup }} → {{ ride.destination }}
+                </td>
+
+                <td>
+                    ₦{{ "{:,.0f}".format(ride.fare_offer) }}
+                </td>
+
+                <td>
+
+                    {% if ride.status == "Pending" %}
+
+                        <span class="pending">
+                            🟡 Pending
+                        </span>
+
+                    {% elif ride.status == "Counter Offered" %}
+
+                        <span class="pending">
+                            Driver offered ₦{{ "{:,.0f}".format(ride.counter_offer) }}
+                        </span>
+
+                        <br><br>
+
+                        <form action="{{ url_for('auth.accept_counter', ride_id=ride.id) }}"
+                              method="POST">
+
+                            <button type="submit" class="primary-btn">
+                                Accept Counter
+                            </button>
+
+                        </form>
+
+                    {% elif ride.status == "Accepted" %}
+
+                        <span class="accepted">
+                            🟢 Ride Accepted
+                        </span>
+
+                        {% if ride.driver %}
+
+                            <br>
+
+                            <small>
+                                Driver:
+                                <strong>{{ ride.driver.fullname }}</strong>
+                            </small>
+
+                            <br>
+
+                            <small>
+                                ⭐ {{ ride.driver.rating }}
+                            </small>
+
+                        {% endif %}
+
+                    {% elif ride.status == "Arriving" %}
+
+                        <span class="accepted">
+                            🚗 Driver is arriving...
+                        </span>
+
+                        {% if ride.driver %}
+
+                            <br>
+
+                            <small>
+                                Driver:
+                                <strong>{{ ride.driver.fullname }}</strong>
+                            </small>
+
+                        {% endif %}
+
+                    {% elif ride.status == "In Progress" %}
+
+                        <span class="accepted">
+                            🚕 Trip in Progress
+                        </span>
+
+                        {% if ride.driver %}
+
+                            <br>
+
+                            <small>
+                                Driver:
+                                <strong>{{ ride.driver.fullname }}</strong>
+                            </small>
+
+                        {% endif %}
+
+                    {% elif ride.status == "Completed" %}
+
+                        <span class="completed">
+                            ✅ Completed
+                        </span>
+
+                    {% elif ride.status == "Cancelled" %}
+
+                        <span class="cancelled">
+                            ❌ Cancelled
+                        </span>
+
+                    {% else %}
+
+                        {{ ride.status }}
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        {% else %}
+
+            <tr>
+
+                <td colspan="3" style="text-align:center;padding:25px;">
+
+                    🚖 You haven't requested any rides yet.
+
+                </td>
+
+            </tr>
+
+        {% endif %}
+
+    </table>
+
+</div>
+
+</main>
+
+</div>
+
+{% endblock %}

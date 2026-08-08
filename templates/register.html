@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create Account | MyMolue
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-page">
+
+    <!-- Left Side -->
+
+    <div class="auth-left">
+
+        <div class="brand">
+
+            <i class="fa-solid fa-location-dot"></i>
+
+            <h1>MyMolue</h1>
+
+        </div>
+
+        <h2>Join the Future of Transportation</h2>
+
+        <p>
+
+            Create your MyMolue account and experience ride negotiation,
+            secure payments, shared rides, and trusted drivers across Nigeria.
+
+        </p>
+
+        <div class="features-list">
+
+            <div>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                Negotiate Your Own Fare
+
+            </div>
+
+            <div>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                Shared Ride Savings
+
+            </div>
+
+            <div>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                Instant Wallet Payments
+
+            </div>
+
+            <div>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                Verified Drivers & Riders
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Right Side -->
+
+    <div class="auth-card">
+
+        <h2>Create Account 🚖</h2>
+
+        <p>Let's get you started.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('auth.register') }}" method="POST">
+
+            <label>Full Name</label>
+
+            <input
+                type="text"
+                name="fullname"
+                placeholder="John Doe"
+                required>
+
+            <label>Email Address</label>
+
+            <input
+                type="email"
+                name="email"
+                placeholder="example@email.com"
+                required>
+
+            <label>Phone Number</label>
+
+            <input
+                type="text"
+                name="phone"
+                placeholder="08012345678"
+                required>
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Create Password"
+                required>
+
+            <label>Register As</label>
+
+            <select name="account_type" required>
+
+                <option value="">Choose Account Type</option>
+
+                <option value="Rider">🚖 Rider</option>
+
+                <option value="Driver">🚗 Driver</option>
+
+            </select>
+
+            <button type="submit">
+
+                <i class="fa-solid fa-user-plus"></i>
+
+                Create Account
+
+            </button>
+
+        </form>
+
+        <div class="register-link">
+
+            Already have an account?
+
+            <a href="{{ url_for('auth.login') }}">
+
+                Login
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,55 +1,41 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="dash-head">
-  <div><span class="tag">{{ current_user.role|capitalize }}</span><h1>Hello, {{ current_user.name.split(' ')[0] }}.</h1></div>
-</div>
+<div class="dash-head"><span class="tag">{{ current_user.role|capitalize }}</span><h1>Hello, {{ current_user.name.split(' ')[0] }}.</h1><p id="location-status">Getting your location…</p></div>
 
-{% if current_user.role == 'driver' %}
-<div class="card">
-  <h2>Driver availability</h2>
-  <form method="post" action="{{ url_for('availability') }}">
-    <input type="hidden" name="online" value="{{ 'false' if current_user.is_online else 'true' }}">
-    <button class="btn" type="submit">{{ 'Go offline' if current_user.is_online else 'Go online' }}</button>
-    <span class="tag">{{ 'Online' if current_user.is_online else 'Offline' }}</span>
-  </form>
-</div>
-<div class="card">
-  <h2>Available requests</h2>
-  <div id="requests">Loading rides…</div>
-</div>
-<script>
-fetch('{{ url_for("rides") }}').then(r=>r.json()).then(rs=>{
-  const el=document.getElementById('requests');
-  el.innerHTML=rs.length ? rs.map(r=>`
-    <div class="ride">
-      <div><strong>${r.pickup} → ${r.destination}</strong><small>Rider offer: ₦${Number(r.fare).toLocaleString()} ${r.shared?'· Shared':''} · ${r.offers} offer(s)</small></div>
-      <form method="post" action="/ride/${r.id}/offer">
-        <input type="number" name="offer" placeholder="Your offer" min="100" required>
-        <button class="btn" type="submit">Offer</button>
-      </form>
-    </div>`).join('') : 'No active requests right now.';
-}).catch(()=>document.getElementById('requests').textContent='Unable to load requests.');
-</script>
+{% if current_user.role == 'rider' %}
+<section class="card">
+<h2>Request a ride</h2>
+<form id="ride-form" method="post" action="{{ url_for('request_ride') }}">
+<label>Pickup<input id="pickup" name="pickup" placeholder="Your pickup point" required></label>
+<label>Destination<input id="destination" name="destination" placeholder="Where are you going?" required></label>
+<div class="grid"><label>Your fare (₦)<input name="fare" type="number" min="100" step="50" required></label><label class="check"><input name="shared" type="checkbox"> Share this ride</label></div>
+<input type="hidden" name="pickup_lat" id="pickup_lat"><input type="hidden" name="pickup_lng" id="pickup_lng"><input type="hidden" name="destination_lat" id="destination_lat"><input type="hidden" name="destination_lng" id="destination_lng">
+<button class="btn" type="submit">Find drivers</button>
+</form>
+<div id="nearby" class="nearby"></div>
+</section>
+{% else %}
+<section class="card"><h2>Driver availability</h2><button class="btn" id="availability">{{ 'Go offline' if current_user.is_online else 'Go online' }}</button><span class="tag" id="online-state">{{ 'Online' if current_user.is_online else 'Offline' }}</span></section>
+<section class="card"><h2>Nearby ride requests</h2><div id="requests">Loading…</div></section>
 {% endif %}
 
-<section class="card">
-  <h2>Your rides</h2>
-  {% for ride in rides %}
-  <div class="ride">
-    <div>
-      <strong>{{ ride.pickup }} → {{ ride.destination }}</strong>
-      <small>₦{{ '%.0f'|format(ride.accepted_fare or ride.rider_fare) }} · {{ ride.status|replace('_',' ')|title }}</small>
-    </div>
-    {% if current_user.role == 'rider' and ride.status == 'requested' %}
-      <a class="btn" href="{{ url_for('ride_offers', ride_id=ride.id) }}">View offers</a>
-    {% elif current_user.role == 'driver' and ride.driver_id == current_user.id and ride.status == 'accepted' %}
-      <form method="post" action="{{ url_for('update_status', ride_id=ride.id) }}"><input type="hidden" name="status" value="arriving"><button class="btn">I'm arriving</button></form>
-    {% elif current_user.role == 'driver' and ride.driver_id == current_user.id and ride.status == 'arriving' %}
-      <form method="post" action="{{ url_for('update_status', ride_id=ride.id) }}"><input type="hidden" name="status" value="in_progress"><button class="btn">Start trip</button></form>
-    {% elif current_user.role == 'driver' and ride.driver_id == current_user.id and ride.status == 'in_progress' %}
-      <form method="post" action="{{ url_for('update_status', ride_id=ride.id) }}"><input type="hidden" name="status" value="completed"><button class="btn">Complete trip</button></form>
-    {% endif %}
-  </div>
-  {% else %}<p>No rides yet.</p>{% endfor %}
+<section class="card"><h2>Your rides</h2>
+{% for ride in rides %}<div class="ride"><div><strong>{{ ride.pickup }} → {{ ride.destination }}</strong><small>₦{{ '%.0f'|format(ride.accepted_fare or ride.rider_fare) }} · {{ ride.status|replace('_',' ')|title }}</small></div>
+{% if current_user.role=='rider' and ride.status=='requested' %}<button class="btn view-offers" data-id="{{ ride.id }}">View offers</button>
+{% elif current_user.role=='driver' and ride.driver_id==current_user.id and ride.status=='accepted' %}<form method="post" action="{{ url_for('status',ride_id=ride.id) }}"><input type="hidden" name="status" value="arriving"><button class="btn">I'm arriving</button></form>
+{% elif current_user.role=='driver' and ride.driver_id==current_user.id and ride.status=='arriving' %}<form method="post" action="{{ url_for('status',ride_id=ride.id) }}"><input type="hidden" name="status" value="in_progress"><button class="btn">Start trip</button></form>
+{% elif current_user.role=='driver' and ride.driver_id==current_user.id and ride.status=='in_progress' %}<form method="post" action="{{ url_for('status',ride_id=ride.id) }}"><input type="hidden" name="status" value="completed"><button class="btn">Complete trip</button></form>
+{% elif ride.status=='completed' %}<button class="btn pay" data-id="{{ ride.id }}">Mark cash paid</button>{% endif %}</div>{% else %}<p>No rides yet.</p>{% endfor %}
 </section>
+<script>
+const postLocation=()=>{if(!navigator.geolocation)return; navigator.geolocation.getCurrentPosition(p=>{const fd=new FormData();fd.append('latitude',p.coords.latitude);fd.append('longitude',p.coords.longitude);fetch('{{ url_for("location") }}',{method:'POST',body:fd}).then(()=>{document.getElementById('location-status').textContent='Location active'; loadNearby();});},()=>document.getElementById('location-status').textContent='Location permission is needed for matching.');};
+const loadNearby=()=>{const el=document.getElementById('nearby');if(!el)return;fetch('{{ url_for("nearby_drivers") }}').then(r=>r.json()).then(x=>{el.innerHTML=x.error?'':`<small>${x.length} driver(s) currently online nearby.</small>`}).catch(()=>{});};
+postLocation(); setInterval(postLocation,15000);
+{% if current_user.role=='driver' %}
+document.getElementById('availability').onclick=()=>{const online=document.getElementById('online-state').textContent.trim()!=='Online';const fd=new FormData();fd.append('online',online?'true':'false');fetch('{{ url_for("availability") }}',{method:'POST',body:fd}).then(()=>location.reload());};
+const loadRequests=()=>fetch('{{ url_for("rides") }}').then(r=>r.json()).then(rs=>{document.getElementById('requests').innerHTML=rs.length?rs.map(r=>`<div class="ride"><div><strong>${r.pickup} → ${r.destination}</strong><small>₦${Number(r.fare).toLocaleString()} · ${r.distance_km==null?'Distance unavailable':r.distance_km+' km away'}</small></div><form method="post" action="/ride/${r.id}/offer"><input name="offer" type="number" min="100" placeholder="Your offer" required><button class="btn">Offer</button></form></div>`).join(''):'No active requests nearby.';});loadRequests();setInterval(loadRequests,10000);
+{% endif %}
+document.querySelectorAll('.view-offers').forEach(b=>b.onclick=()=>fetch('/ride/'+b.dataset.id+'/offers').then(r=>r.json()).then(os=>{const text=os.length?os.map(o=>`${o.driver}: ₦${o.amount} (${o.distance_km??'?'} km) — offer #${o.id}`).join('\n'):'No offers yet.';alert(text+'\n\nUse the offer ID to accept it from the next release of the rider UI.');}));
+document.querySelectorAll('.pay').forEach(b=>b.onclick=()=>{const fd=new FormData();fd.append('method','cash');fetch('/ride/'+b.dataset.id+'/payment',{method:'POST',body:fd}).then(r=>r.json()).then(x=>alert(x.status==='paid'?'Cash payment recorded.':'Payment pending.'));});
+</script>
 {% endblock %}

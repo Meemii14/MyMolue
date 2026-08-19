@@ -1,0 +1,8 @@
+[build]
+  publish = "public"
+
+[functions]
+  directory = "netlify/functions"
+
+# The Flask API is deployed separately; Netlify hosts the web frontend.
+# Set API_BASE_URL in Netlify when the backend URL is available.

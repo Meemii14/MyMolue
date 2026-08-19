@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dash-head"><span class="tag">Admin</span><h1>MyMolue operations.</h1><p class="muted">Platform overview and live operational metrics.</p></div>
+<div class="features">
+<article><b>USERS</b><h3>{{ metrics.users }}</h3><p>Total registered accounts.</p></article>
+<article><b>DRIVERS ONLINE</b><h3>{{ metrics.drivers_online }}</h3><p>Drivers currently available.</p></article>
+<article><b>RIDES</b><h3>{{ metrics.rides }}</h3><p>Total ride requests.</p></article>
+<article><b>COMPLETED</b><h3>{{ metrics.completed }}</h3><p>Trips completed.</p></article>
+<article><b>PAID</b><h3>{{ metrics.paid }}</h3><p>Payments recorded as paid.</p></article>
+<article><b>GROSS VALUE</b><h3>₦{{ '%.0f'|format(metrics.revenue) }}</h3><p>Paid trip value.</p></article>
+</div>
+{% endblock %}

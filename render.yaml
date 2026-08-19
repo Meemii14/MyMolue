@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: mymolue-api
+    runtime: python
+    plan: free
+    branch: agent/rebuild-mymolue
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: PAYSTACK_PUBLIC_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false

@@ -1,0 +1,22 @@
+[build]
+  publish = "public"
+
+[functions]
+  directory = "netlify/functions"
+
+# The Flask API is deployed separately because Netlify Functions are
+# serverless and the MyMolue Flask + Socket.IO backend needs a persistent
+# web service for realtime ride operations.
+# Set API_BASE_URL in Netlify to the deployed Flask backend URL.
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://REPLACE_WITH_BACKEND_URL/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = true
